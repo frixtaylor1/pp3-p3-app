@@ -1,26 +1,26 @@
 .video-wrap {
-    position: relative;
+  position: relative;
 }
 
 video {
-    width: 50%;
-    height: auto;
+  width: 50%;
+  height: auto;
 }
 
 .controller {
-    text-align: center;
+  text-align: center;
 }
 
 button {
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #0074d9;
-    color: white;
-    border: none;
-    cursor: pointer;
+  margin: 10px;
+  padding: 10px 20px;
+  background-color: #0074d9;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 
 button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  background-color: #ccc;
+  cursor: not-allowed;
 }

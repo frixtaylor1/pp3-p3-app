@@ -45,8 +45,6 @@ class ChatBotController {
         this.preguntarCarrera();
       } else if (!this.usuarioActual.email) {
         this.preguntarEmail();
-      } else if (!this.usuarioActual.cameraInitialized) {
-        this.inicializarCamara();
       } else if (!this.usuarioActual.apellido) {
         this.preguntarApellido();
       } else if (!this.usuarioActual.nombre) {
@@ -59,6 +57,10 @@ class ChatBotController {
         this.preguntarFechaNacimiento();
       } else if (!this.usuarioActual.telefono) {
         this.preguntarTelefono();
+      } else if (!this.usuarioActual.cameraInitialized) {
+        this.inicializarCamara();
+      } else if (!this.usuarioActual.preguntarDescargaPlanilla) {
+        this.preguntarDescargaPlanilla();
       } else {
         this.agradecerYReiniciarChat();
       }
@@ -150,6 +152,7 @@ class ChatBotController {
       }
     };
   }
+  
   preguntarCarrera() {
     this.view.agregarMensaje(
       "¿A qué carrera deseas preinscribirte? (textil, logística, sistemas, turismo, gestión ambiental)",
@@ -195,7 +198,7 @@ class ChatBotController {
           `Tu dirección de correo electrónico (${respuestaUsuario}) ha sido guardada.`,
           true
         );
-        this.inicializarCamara();
+        this.preguntarApellido();
       } else {
         this.view.agregarMensaje(
           "Dirección de correo electrónico inválida. Por favor, ingresa una dirección de correo válida.",
@@ -276,79 +279,6 @@ class ChatBotController {
     };
   }
 
-  // inicializarCamara() {
-  //   // Crea instancias del modelo, vista y controlador de la cámara
-
-  //   const model = new WebcamModel();
-  //   const view = new WebcamView();
-  //   const controller = new WebcamController(view, model);
-
-  //   controller.inicializar();
-
-  //   // Agrega la vista de la cámara al contenedor del chatbot
-  //   this.view.chatbotContainer.appendChild(view);
-  //   this.usuarioActual.cameraInitialized = true;
-
-  //   this.view.agregarMensaje("La cámara se ha inicializado.", true);
-  //   this.preguntarApellido();
-  // }
-
-  inicializarCamara() {
-    // Añadir un mensaje del chatbot
-    this.view.agregarMensaje(
-      "Chatbot: Escribe 'continuar' para tomarte una foto.",
-      true
-    );
-
-    this.view.onSendMessage = (mensaje) => {
-      // Verificar si el mensaje es 'continuar' antes de inicializar la cámara
-      if (mensaje.toLowerCase() === "continuar") {
-        // Código para inicializar la cámara
-        const model = new WebcamModel();
-        const view = new WebcamView();
-        const controller = new WebcamController(view, model);
-
-        controller.inicializar();
-
-        this.view.chatbotContainer.appendChild(view);
-
-        this.view.agregarMensaje("Chatbot: Cámara inicializada!", true);
-
-        // Continuar con el flujo
-        this.preguntarApellido();
-      } else {
-        // Si el mensaje no es 'continuar', puedes dar retroalimentación al usuario
-        this.view.agregarMensaje(
-          "Chatbot: Por favor, escribe 'continuar' para tomarte una foto.",
-          true
-        );
-      }
-    };
-  }
-
-  agradecerYReiniciarChat() {
-    // Detener y eliminar la cámara
-    this.view.chatbotContainer.removeChild(this.view); // Elimina la vista de la cámara
-    this.view = null; // Marca la vista como nula para liberar recursos
-
-    this.view.agregarMensaje(
-      "Gracias por completar los datos de la preinscripción. Hemos guardado toda tu información.",
-      true
-    );
-
-    this.usuarioActual = null;
-    this.preguntaRegistro();
-  }
-
-  preguntarEdad() {
-    this.view.agregarMensaje("Ingresa tu edad:", true);
-    this.view.onSendMessage = (respuestaUsuario) => {
-      this.usuarioActual.edad = respuestaUsuario.trim();
-      this.view.agregarMensaje("Edad guardada.", true);
-      this.preguntarFechaNacimiento();
-    };
-  }
-
   preguntarEdad() {
     this.view.agregarMensaje("Ingresa tu edad:", true);
     this.view.onSendMessage = (respuestaUsuario) => {
@@ -411,7 +341,88 @@ class ChatBotController {
     this.view.onSendMessage = (respuestaUsuario) => {
       this.usuarioActual.telefono = respuestaUsuario.trim();
       this.view.agregarMensaje("Número de teléfono guardado.", true);
-      this.agradecerYReiniciarChat();
+      this.inicializarCamara();
+    };
+  }
+
+  preguntarDescargaPlanilla() {
+    this.view.agregarMensaje(
+      "Gracias por haber completado los campos solicitados de preinscripción correctamente. " +
+        "Para continuar, haz clic en la imagen a continuación para descargar la Planilla de Inscripción General a Carreras:",
+      true
+    );
+
+    const imagenContainer = document.createElement("div");
+    imagenContainer.style.textAlign = "center"; // Centra horizontalmente
+
+    const imagenEnlace = document.createElement("a");
+    imagenEnlace.href =
+      "https://drive.google.com/file/d/18rcLOjj_Lf246i1HCXvNi_GlgIAJSS1M/view";
+    imagenEnlace.target = "_blank";
+
+    const imagen = document.createElement("img");
+    imagen.src = "imagen.png"; // Reemplaza con la URL de la imagen que desees mostrar
+    imagen.style.maxWidth = "15%"; //  ancho máximo de la imagen al 20%
+
+    imagenEnlace.appendChild(imagen);
+
+    imagenContainer.appendChild(imagenEnlace);
+
+    // Agregar el contenedor al mensaje
+    const mensaje = document.createElement("p");
+    mensaje.appendChild(imagenContainer);
+    this.view.chatbox.appendChild(mensaje);
+
+    this.agradecerYReiniciarChat();
+  }
+
+  inicializarCamara() {
+    this.view.agregarMensaje(
+      "Chatbot: Escribe 'continuar' para tomar una foto.",
+      true
+    );
+
+    this.view.onSendMessage = (mensaje) => {
+      if (mensaje.toLowerCase() === "continuar") {
+        this.view.agregarMensaje(
+          "Cámara inicializada. Capturando foto...",
+          true
+        );
+
+        const model = new WebcamModel();
+        const view = new WebcamView();
+        const controller = new WebcamController(view, model);
+
+        controller.inicializar();
+
+        const camaraContainer = document.createElement("div");
+        camaraContainer.style.display = "flex";
+        camaraContainer.style.justifyContent = "center";
+        camaraContainer.style.alignItems = "center";
+
+        const videoContainer = document.createElement("div");
+        videoContainer.style.width = "100%";
+        videoContainer.style.height = "100%";
+
+        videoContainer.appendChild(view);
+
+        camaraContainer.appendChild(videoContainer);
+
+        this.view.chatbox.appendChild(camaraContainer);
+
+        controller.view.confirmarBoton.addEventListener("click", () => {
+          // avanzar a la siguiente pregunta aquí.
+          this.preguntarDescargaPlanilla();
+        });
+
+        // Desplázate automáticamente al elemento de la cámara
+        camaraContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        this.view.agregarMensaje(
+          "Por favor, escribe 'continuar' para tomar una foto.",
+          true
+        );
+      }
     };
   }
 
@@ -423,8 +434,6 @@ class ChatBotController {
     this.usuarioActual = null;
     this.preguntaRegistro();
   }
-
-  // ... (resto de los métodos de ChatBotController)
 }
 
 export { ChatBotController };

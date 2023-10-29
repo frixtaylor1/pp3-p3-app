@@ -64,8 +64,17 @@ class WebcamController {
     // }
   }
 
-  async confirmarFoto() {
+  // async confirmarFoto() {
+  //   this.detenerCamara();
+  // }
+
+  async confirmarFoto(callback) {
     this.detenerCamara();
+
+    // Llama al callback (en este caso, el callback es una función de ChatBotController).
+    if (callback) {
+      callback();
+    }
   }
 
   cancelarFoto() {

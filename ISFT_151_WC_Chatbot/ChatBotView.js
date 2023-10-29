@@ -2,6 +2,7 @@ class ChatBotView extends HTMLElement {
   constructor() {
     super();
 
+    // Cabecera
     this.header = document.createElement("header");
 
     this.h2 = document.createElement("h2");
@@ -17,6 +18,7 @@ class ChatBotView extends HTMLElement {
     this.chatbox = document.createElement("ul");
     this.chatbox.className = "chatbox";
 
+    // Campo de escritura
     this.userInput = document.createElement("textarea");
     this.userInput.className = "chat-input-text";
     this.userInput.placeholder = "Escriba su mensaje...";
@@ -29,6 +31,7 @@ class ChatBotView extends HTMLElement {
     this.sendButton.textContent = "send";
     this.sendButton.style.visibility = "hidden";
 
+    // Contenedor de mensajes
     this.buttonsContainer = document.createElement("div");
     this.buttonsContainer.className = "chat-input";
     this.buttonsContainer.style.display = "flex";
@@ -43,11 +46,30 @@ class ChatBotView extends HTMLElement {
     this.buttonsContainer.appendChild(this.userInput);
     this.buttonsContainer.appendChild(this.sendButton);
 
+    // Contenedor de barra de progreso
+    this.barContainer = document.createElement("div");
+    this.barContainer.innerText = 'Preinscription (0%)';
+    this.barContainer.style.textAlign = 'center';
+    this.barContainer.style.width = "0";
+    this.barContainer.style.display = "block";
+    this.barContainer.style.gap = "5px";
+    this.barContainer.style.bottom = "0";
+    this.barContainer.style.width = "100%";
+    this.barContainer.style.color = "white";
+    this.barContainer.style.background = "grey";
+    this.barContainer.style.borderTop = "1px solid #dddd";
+
+    this.progressBar = document.createElement("div");
+
+    this.barContainer.appendChild(this.progressBar);
+
     this.chatbotContainer = document.createElement("div");
     this.chatbotContainer.className = "chatbot";
     this.chatbotContainer.appendChild(this.header);
+    this.chatbotContainer.appendChild(this.barContainer);
     this.chatbotContainer.appendChild(this.chatbox);
     this.chatbotContainer.appendChild(this.buttonsContainer);
+    
 
     this.chatbotToggler = document.createElement("button");
     this.chatbotToggler.className = "chatbot-toggler";
@@ -108,9 +130,44 @@ class ChatBotView extends HTMLElement {
     this.agregarMensaje(`Tú: ${respuestaUsuario}`, false);
     this.userInput.value = "";
 
+    // Mostrar la barra de progreso
+    this.mostrarBarraDeProgreso();
+
     if (this.onSendMessage) {
-      this.onSendMessage(respuestaUsuario);
+      // Simular un tiempo de respuesta (reemplaza esto con tu lógica real)
+      setTimeout(() => {
+        // Ocultar la barra de progreso
+        this.ocultarBarraDeProgreso();
+
+        // Llamada a la función onSendMessage después de la respuesta simulada
+        if (this.onSendMessage) {
+          this.onSendMessage(respuestaUsuario);
+        }
+      }, 2000); // Simulación de 2 segundos de tiempo de respuesta
     }
+  }
+
+  // Función para mostrar la barra de progreso
+  mostrarBarraDeProgreso() {
+    this.barContainer.style.width = "0";
+    this.barContainer.style.visibility = "visible";
+
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 100) {
+        clearInterval(interval);
+      } else {
+        width++;
+        this.barContainer.style.width = width + "%";
+        this.barContainer.innerText = width + '%'; // Actualizar el texto del porcentaje
+      }
+    }, 20);
+  }
+
+  // Función para ocultar la barra de progreso
+  ocultarBarraDeProgreso() {
+    this.progressBar.style.width = "0";
+    this.progressBar.style.visibility = "hidden";
   }
 
   agregarMensaje(mensaje, esBot) {
