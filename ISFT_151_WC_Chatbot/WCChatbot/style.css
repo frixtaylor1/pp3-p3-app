@@ -1,0 +1,15 @@
+/* Estilos de la barra de progreso en el contenedor de chat */
+.progress-bar {
+    width: 100%; 
+    height: 20px; 
+    background-color: #ccc; 
+    margin-bottom: 10px; 
+  }
+  
+  /* Estilos para el relleno de la barra de progreso */
+  .progress-bar-fill {
+    height: 100%; 
+    background-color: #048d09; 
+    transition: width 0.3s;
+  }
+  
