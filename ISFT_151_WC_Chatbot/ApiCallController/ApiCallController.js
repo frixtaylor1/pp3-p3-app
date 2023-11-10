@@ -1,4 +1,4 @@
-class ApiController {
+class ApiCallController {
   constructor(url) {
     this.url = url;
   }
@@ -27,4 +27,4 @@ class ApiController {
   }
 }
 
-export { ApiController };
+export { ApiCallController };
