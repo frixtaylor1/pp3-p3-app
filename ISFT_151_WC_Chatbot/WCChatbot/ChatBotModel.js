@@ -315,7 +315,8 @@ class ChatBotModel {
         'completed': () => {
           this.confirmedData = this.preinscriptionData;
           this.questions.set('verificationUserData', {
-            text    : `Son correctos estos datos ?${this.confirmedData}`,
+            text    : `Son correctos estos datos ?
+            ${JSON.stringify(this.confirmedData)} (SI/NO)`,
             nextYes : 'gratitude',
             nextNo  : 'modifyFields',
           });
