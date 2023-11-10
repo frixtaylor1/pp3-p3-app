@@ -1,7 +1,9 @@
+import { ApiCallController } from '../ApiCallController/ApiCallController.js';
+
 class ChatBotModel {
   constructor() 
   {
-    this.apiController = new ApiController('localhost:3000');
+    this.apiController = new ApiCallController('localhost:3000');
 
     this.confirmedData = {};
 
@@ -118,6 +120,9 @@ class ChatBotModel {
       text: 'Carrera (textil, logistica, sistemas, turismo,gestión ambiental): ',
       next: 'email',
       options: this.carrerasValidas, // Agrega las carreras disponibles como opciones
+      validation: (response) => {
+        return this.carrerasValidas.includes(response);
+      }
     });
     
     this.questions.set('email', {
@@ -156,6 +161,12 @@ class ChatBotModel {
     this.questions.set('modifyFieldValue', {
       text: 'Ingresa el nuevo valor para el campo:',
       next: 'completed',
+    });
+
+    this.questions.set('completed', {
+      text: 'Se ha completado los datos de inscripción. Quieres verificar tu datos? (SI/NO)',
+      nextYes: 'verificationUserData',
+      nextNo: 'modidyFieldValue'
     });
 
     //Inicio de chat en WELCOME
@@ -292,16 +303,29 @@ class ChatBotModel {
           }
         },
 
+        'verificationUserData': () => {
+
+          if (response.toUpperCase() == 'SI') {
+            this.currentQuestionId = 'gratitude';
+          } else if (response.toUpperCase() == 'NO') {
+            this.currentQuestionId = 'modifyFields';
+          }
+        },
+
         'completed': () => {
+          this.confirmedData = this.preinscriptionData;
+          this.questions.set('verificationUserData', {
+            text    : `Son correctos estos datos ?
+            ${JSON.stringify(this.confirmedData)} (SI/NO)`,
+            nextYes : 'gratitude',
+            nextNo  : 'modifyFields',
+          });
+          this.currentQuestionId = 'verificationUserData';
+
+          console.log('ENTRO!');
           if (response.toUpperCase() === 'SI') 
           {
-            this.confirmedData = this.preinscriptionData;
-            this.questions.set('verificationUserData', {
-              text    : `Nombre: ${this.confirmedData.nombre}, Appellido: ${this.confirmedData.apellido}`,
-              nextYes : 'gratitude',
-              nextNo  : 'modifyFields',
-            });
-            this.currentQuestionId = 'verificationUserData';
+
 
             // Aca se llamara a la funcion confirmPreinscription() si es necesario
           } 
