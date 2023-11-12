@@ -1,61 +1,59 @@
 class ChatBotController 
 {
-  constructor(ChatBotView, chatBotModel) 
-  {
+  constructor(ChatBotView, chatBotModel) {
     this.view = ChatBotView;
     this.model = chatBotModel;
 
     this.view.addEventListener("send", (e) => this.onSend(e));
+    this.view.addEventListener("photoprofilereceived", (e) =>
+      this.onPhotoProfileReceived(e)
+    );
 
     this.startChat();
   }
 
-  startChat() 
-  {
+  startChat() {
     // Inicia el chat mostrando la primera pregunta
-    this.view.addMessage(this.model.getCurrentQuestion().text);
-    this.view.hidePercentBar();
 
+    this.view.addMessage(this.model.getCurrentQuestion().text, true);
+    this.view.hidePercentBar();
   }
 
-  updateProgress() 
-  {
+  updateProgress() {
     let progress = this.model.getPreinscriptionPercent();
 
-    if (progress >= 0) 
-    {
+    if (progress >= 0) {
       this.view.setPercentBar(progress);
       this.view.showPercentBar();
-    } 
-    
-    else 
-    {
+    } else {
       this.view.hidePercentBar();
     }
   }
 
-  onSend(event) 
-  {
+  onPhotoProfileReceived(event) {
+    this.enableInput();
+  }
+
+  onSend(event) {
     let data = event.detail;
 
     this.view.addMessage(data);
 
-    // Envía la respuesta al modelo
     this.model.sendResponseToQuestion(data);
 
-    // Limpia la vista
     this.view.clearInput();
 
-    // Obtiene la siguiente pregunta
     const nextQuestion = this.model.getCurrentQuestion();
 
-    if (nextQuestion) 
-    {
-      // Si hay otra pregunta, la muestra en la vista
-      this.view.addMessage(nextQuestion.text);
-    } 
+    if (nextQuestion) {
+      if (nextQuestion === "Necesitamos una foto tuya") {
+        this.view.disableInput();
+        this.view.openCamera();
+      }
+      this.view.addMessage(nextQuestion.text, true);
+    }
 
-    this.updateProgress(); // Actualiza la barra de progreso en la vista
+    this.updateProgress();
 
     this.#onRegister();
     this.#onPreInscriptionStarted();
@@ -68,6 +66,7 @@ class ChatBotController
       confirmPreinscriptionResult.then((result) => {
         console.log(result);
       });
+      this.view.setPercentBar(0);
     }
   }
 
@@ -87,6 +86,7 @@ class ChatBotController
       preinscriptionStartedResult.then((result) => {
         console.log(result);
         localStorage.setItem('id_major', result.id_major);
+        localStorage.setItem('id_preinscription', result.id_preinscription);
       });
     }
   }

@@ -293,15 +293,20 @@ class ChatBotModel {
           this.registerProcessStatus = true;
         },
 
+        'email': () => {
+          this.email = response;
+          this.startPreinscriptionStatus  = false;
+          this.currentQuestionId = 'foto';
+        },
+
         'carrera': () => {
           if (this.carrerasValidas.includes(response.toLowerCase())) 
           {
             this.preinscriptionData.carrera = response;
-            this.startPreinscriptionStatus = true;
+            this.startPreinscriptionStatus  = true;
             
-            this.currentQuestionId = 'email';
+            this.currentQuestionId          = 'email';
           } 
-
           else 
           {
             this.currentQuestionId = 'carrera';
@@ -322,7 +327,10 @@ class ChatBotModel {
           this.confirmedData = this.preinscriptionData;
           this.questions.set('verificationUserData', {
             text    : `Son correctos estos datos ?
-            ${JSON.stringify(this.confirmedData)} (SI/NO)`,
+Nombre completo: ${this.confirmedData.nombre} ${this.confirmedData.apellido} 
+fecha de nacimiento: (${this.confirmedData.fechaNacimiento}) 
+        
+Responde si son correctos: (SI/NO)`,
             nextYes : 'gratitude',
             nextNo  : 'modifyFields',
           });
@@ -452,11 +460,15 @@ class ChatBotModel {
    * @return  {Promise<JSON>}
    **/
   async confirmPreinscription() {
-
     let preinscriptionData = {
-      id_user: localStorage.getItem('id_user'),
-      id_major: localStorage.getItem('id_major'),
-      ...this.confirmedData,
+      id_user           : parseInt(localStorage.getItem('id_user')),
+      id_major          : parseInt(localStorage.getItem('id_major')),
+      id_preinscription : parseInt(localStorage.getItem('id_preinscription')),
+      name              : this.confirmedData.nombre,
+      surname           : this.confirmedData.apellido,
+      dni               : this.confirmedData.dni,
+      birthdate         : (this.confirmedData.fechaNacimiento).replace('/', '-'),
+      email             : this.confirmedData.email,
     };
 
     console.log('PREINSCRIPTION DATA >>>', preinscriptionData);
