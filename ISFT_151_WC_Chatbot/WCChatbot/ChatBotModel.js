@@ -3,9 +3,12 @@ import { ApiCallController } from '../ApiCallController/ApiCallController.js';
 class ChatBotModel {
   constructor() 
   {
-    this.apiController = new ApiCallController('localhost:3000');
+    this.apiController = new ApiCallController('http://127.0.0.1:3336');
 
-    this.confirmedData = {};
+    this.processStatus              = false;
+    this.registerProcessStatus      = false;
+    this.startPreinscriptionStatus  = false;
+    this.confirmedData              = {};
 
     this.registerData = 
     {
@@ -208,7 +211,6 @@ class ChatBotModel {
   
   getPreinscriptionPercent() 
   {
-
     let totalFields = Object.keys(this.preinscriptionData).length;
 
     // Filtra y cuenta los campos no nulos o completados
@@ -272,7 +274,6 @@ class ChatBotModel {
             this.loggedIn = true;
             this.currentQuestionId = 'completed';
           } 
-
           else 
           {
             // Contraseña no valida
@@ -288,12 +289,16 @@ class ChatBotModel {
         'createAccountPassword': () => {
           this.registerData.password = response;
           this.currentQuestionId = 'nombre';
+
+          this.registerProcessStatus = true;
         },
 
         'carrera': () => {
           if (this.carrerasValidas.includes(response.toLowerCase())) 
           {
             this.preinscriptionData.carrera = response;
+            this.startPreinscriptionStatus = true;
+            
             this.currentQuestionId = 'email';
           } 
 
@@ -307,6 +312,7 @@ class ChatBotModel {
 
           if (response.toUpperCase() == 'SI') {
             this.currentQuestionId = 'gratitude';
+            this.processStatus = true;
           } else if (response.toUpperCase() == 'NO') {
             this.currentQuestionId = 'modifyFields';
           }
@@ -322,12 +328,8 @@ class ChatBotModel {
           });
           this.currentQuestionId = 'verificationUserData';
 
-          console.log('ENTRO!');
           if (response.toUpperCase() === 'SI') 
           {
-
-
-            // Aca se llamara a la funcion confirmPreinscription() si es necesario
           } 
           
           else if (response.toUpperCase() === 'NO') 
@@ -407,19 +409,36 @@ class ChatBotModel {
     }
   }
 
+  isCompleted() {
+    return this.processStatus;  
+  }
+
+  isRegistered() {
+    return this.registerProcessStatus;
+  }
+
+  isPreinscriptionStarted() {
+    return this.startPreinscriptionStatus;
+  }
+
   /**
    * @brief Comienza la inscripcion 
    * 
    * @apidoc /startPreinscription
    * @method  HTTP:POST
    * 
-   * @param {JSON} data { id_user, id_major }
-   * 
    * @returns {Promise<JSON>}
    */
-  async startPreinscription(data) {
-    let request = await this.apiController.callApi('/startPreinscription', 'POST', data);
-    let result  = await request.json();
+  async startPreinscription() {
+    const startPreinscriptionData = {
+      'id_user'   : parseInt(localStorage.getItem('id_user')),
+      'major_name': this.preinscriptionData.carrera,
+    };
+
+    console.log(startPreinscriptionData);
+
+    let response = await this.apiController.callApi('/startPreinscription', 'POST', startPreinscriptionData);
+    let result   = response[0];
 
     return result;
   }
@@ -430,13 +449,22 @@ class ChatBotModel {
    * @apidoc /confirmPreinscription
    * @method  HTTP:POST
    * 
-   * @param {JSON} data // id_user, id_preinscription, name, surname, dni, birthdate, email
-   * 
    * @return  {Promise<JSON>}
    **/
-  async confirmPreinscription(data) {
-    let request = await this.apiController.callApi('/confirmPreinscription', 'POST', data);
+  async confirmPreinscription() {
+
+    let preinscriptionData = {
+      id_user: localStorage.getItem('id_user'),
+      id_major: localStorage.getItem('id_major'),
+      ...this.confirmedData,
+    };
+
+    console.log('PREINSCRIPTION DATA >>>', preinscriptionData);
+
+    let request = await this.apiController.callApi('/confirmPreinscription', 'POST', preinscriptionData);
     let result  = await request.json();
+
+    this.processStatus = false;
 
     return result;
   }
@@ -452,11 +480,28 @@ class ChatBotModel {
    * @return  {Promise<JSON>}
    **/
     async cancelPreinscription(data) {
-      let request = await this.apiController.callApi('/cancelPreinscription', 'POST', data);
-      let result  = await request.json();
+      let response = await this.apiController.callApi('/cancelPreinscription', 'POST', data);
+      let result   = await response.json();
 
       return result;
     }
+
+  /**
+   * @brief Registra un usuario
+   * 
+   * @apidoc /signUp
+   * @method  HTTP:POST 
+   * 
+   * @return  {Promise<JSON>}
+   **/
+  async signUp() {
+    this.registerProcessStatus = false;
+
+    let response = await this.apiController.callApi('/signUp', 'POST', this.registerData);
+    let result   = response[0][0];
+
+    return result;
+  }
 }
 
 export { ChatBotModel };

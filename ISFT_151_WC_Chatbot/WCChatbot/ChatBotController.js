@@ -56,6 +56,39 @@ class ChatBotController
     } 
 
     this.updateProgress(); // Actualiza la barra de progreso en la vista
+
+    this.#onRegister();
+    this.#onPreInscriptionStarted();
+    this.#onCompleted();
+  }
+
+  #onCompleted() {
+    if (this.model.isCompleted()) {
+      let confirmPreinscriptionResult = this.model.confirmPreinscription();
+      confirmPreinscriptionResult.then((result) => {
+        console.log(result);
+      });
+    }
+  }
+
+  #onRegister() {
+    if (this.model.isRegistered()) {
+      let registrationResult = this.model.signUp();
+      registrationResult.then((result) => {
+        console.log(result);
+        localStorage.setItem('id_user', result.user_last_insert_id);
+      })
+    }
+  }
+
+  #onPreInscriptionStarted() {
+    if (this.model.isPreinscriptionStarted()) {
+      let preinscriptionStartedResult = this.model.startPreinscription();
+      preinscriptionStartedResult.then((result) => {
+        console.log(result);
+        localStorage.setItem('id_major', result.id_major);
+      });
+    }
   }
 }
 
