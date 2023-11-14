@@ -1,6 +1,7 @@
 import { ApiCallController } from '../ApiCallController/ApiCallController.js';
 
-class ChatBotModel {
+class ChatBotModel 
+{
   constructor() 
   {
     this.apiController = new ApiCallController('http://127.0.0.1:3336');
@@ -84,7 +85,7 @@ class ChatBotModel {
     
     this.questions.set('apellido', {
       text: 'Apellido: ',
-      next: 'edad',
+      next: 'fechaNacimiento',
       validation: (response) => {
   
         return /^[A-Za-z\s]+$/.test(response.trim());
@@ -93,12 +94,12 @@ class ChatBotModel {
     
     this.questions.set('edad', {
       text: 'Edad: ',
-      next: 'fechaNacimiento',
-      validation: (response) => {
+      // next: 'fechaNacimiento',
+      // validation: (response) => {
    
-        let age = parseInt(response);
-        return !isNaN(age) && age >= 18 && age <= 99;
-      },
+      //   let age = parseInt(response);
+      //   return !isNaN(age) && age >= 18 && age <= 99;
+      // },
     });
     
     this.questions.set('fechaNacimiento', {
@@ -312,6 +313,19 @@ class ChatBotModel {
             this.currentQuestionId = 'carrera';
           }
         },
+        'fechaNacimiento': () => {
+          if (this.questions.get('fechaNacimiento').validation) 
+          {
+            this.preinscriptionData.edad = this.#calculateAge((this.#parseDate(`${response}`)));
+            this.preinscriptionData.fechaNacimiento = response;
+
+            this.currentQuestionId          = 'telefono';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'fechaNacimiento';
+          }
+        },
 
         'verificationUserData': () => {
 
@@ -329,6 +343,7 @@ class ChatBotModel {
             text    : `Son correctos estos datos ?
 Nombre completo: ${this.confirmedData.nombre} ${this.confirmedData.apellido} 
 fecha de nacimiento: (${this.confirmedData.fechaNacimiento}) 
+edad: (${this.confirmedData.edad}) 
         
 Responde si son correctos: (SI/NO)`,
             nextYes : 'gratitude',
@@ -514,6 +529,43 @@ Responde si son correctos: (SI/NO)`,
 
     return result;
   }
+    /**
+   * @brief Calcula la edad de un usuario
+   * 
+   * @param {string} fecha de nacimientoo
+   * 
+   * @return  {string} edad
+   **/
+  #calculateAge(birthdate) 
+  {
+    let currentDate = new Date();
+
+    // Calcular la diferencia en milisegundos entre la fecha actual y la fecha de nacimiento
+    let difference = currentDate - birthdate;
+
+    // Convertir la diferencia de milisegundos a años
+    let age = Math.floor(difference / (1000 * 60 * 60 * 24 * 365.25));
+
+    return age;
+  }
+    /**
+   * @brief Parsea formato de fecha a Year/month/day
+   * 
+   * @param {string} fecha
+   * 
+   * @return  {object} Date
+   **/
+    #parseDate(dateString) 
+    {
+      const parts = dateString.split('/');
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;  // Restamos 1 porque en JavaScript los meses van de 0 a 11
+      const year = parseInt(parts[2], 10);
+    
+      return new Date(year, month, day);
+    }
+    
+
 }
 
 export { ChatBotModel };
