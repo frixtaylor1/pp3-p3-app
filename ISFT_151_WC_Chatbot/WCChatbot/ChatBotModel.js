@@ -295,7 +295,7 @@ class ChatBotModel
         },
 
         'email': () => {
-          this.email = response;
+          this.preinscriptionData.email = response;
           this.startPreinscriptionStatus  = false;
           this.currentQuestionId = 'foto';
         },
@@ -341,11 +341,11 @@ class ChatBotModel
           this.confirmedData = this.preinscriptionData;
           this.questions.set('verificationUserData', {
             text    : `Son correctos estos datos ?
-Nombre completo: ${this.confirmedData.nombre} ${this.confirmedData.apellido} 
-fecha de nacimiento: (${this.confirmedData.fechaNacimiento}) 
-edad: (${this.confirmedData.edad}) 
+          Nombre completo: ${this.confirmedData.nombre} ${this.confirmedData.apellido} 
+          fecha de nacimiento: (${this.confirmedData.fechaNacimiento}) 
+          edad: (${this.confirmedData.edad}) 
         
-Responde si son correctos: (SI/NO)`,
+          Responde si son correctos: (SI/NO)`,
             nextYes : 'gratitude',
             nextNo  : 'modifyFields',
           });
