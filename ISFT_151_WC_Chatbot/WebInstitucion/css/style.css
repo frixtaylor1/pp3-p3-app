@@ -1,0 +1,377 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif; 
+}
+
+.container{
+    max-width: 90%;
+    padding: 0 5rem;
+    align-items: center;
+}
+
+/*----------NAVBAR----------*/
+.navbar{
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+}
+
+#smedia{ /*borde que separa los iconos de rrss de los otros enlaces*/
+    border-left: 1px solid rgb(0, 0, 0);
+
+}
+
+nav i{ /*separación entre los iconos*/
+    padding: 0.2em;
+    font-size: 2vw;
+    vertical-align: middle;
+}
+
+/*links navbar*/
+nav a {
+    color: rgb(0, 0, 0);
+    padding: 0.5em;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+/*hover para los links de la navbar*/
+nav a:hover{
+    color: #45b3ea;
+}
+
+/*aplica a todos los botones*/
+button{ 
+    padding: 0.5em 1em;
+    border-radius: 1rem;
+    border: 1px solid #0376C3;
+    background-color:#0376C3;
+}
+
+button a{
+    color: white; /*solo para cambiar el color de la letra del boton de la navbar*/
+    text-decoration: none;
+    font-weight: 750;
+}
+
+/*hover todos los botones*/
+button:hover{
+    background-color: #36b1d6;
+    border: 1px solid #36b1d6;
+}
+
+/*hover link boton navbar*/
+button a:hover{
+    color: white;
+}
+
+/*----------HEADER----------*/
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50vh;
+    padding: 50px 0px;
+}
+
+#header-titles{
+    text-align: left;
+    width: 60%;
+
+}
+
+#header-titles h1{
+    font-weight: 700;
+    font-size: 3.5vw;
+    padding-bottom: 20px;
+}
+
+span {
+    color: #0376C3;
+}
+
+#btn-header{
+    font-size: 15px;
+}
+
+/*----------HEADER - IMAGES----------*/
+.img-header{
+    border-radius:10px;
+    background-position: center;
+    background-size: cover;
+    animation: banner 10s infinite;
+    width: 40%;
+    height: 100%;
+}
+
+@keyframes banner{
+  0%, 100% {
+    background-image: url(../img/hero1.webp);
+  }
+
+  25%, 30% {
+    background-image: url(../img/hero2.webp);
+  }
+
+  55%, 60% {
+    background-image: url(../img/hero3.webp)
+  }
+}
+
+/*----------SECTION 1----------*/
+.section1{
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    text-align: center;
+    background-color: #0578BB;
+    height: 50vh;
+}
+
+#bkgd-s1{
+    width: 60%;
+    background-image: url(../img/instituto.webp);
+    opacity: 0.7;
+    background-attachment: fixed;
+}
+
+.section1 h2 {
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/*----------SECTION 2 - CAREERS----------*/
+.section2{
+    padding-top: 50px;
+    text-align: center;
+    height: 80vh;
+}
+
+.section2 h2{
+    font-size: 3.5vh;
+    padding-bottom: 30px;
+}
+
+/*----------CAREERS CARDS----------*/
+.carousel-container {
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-inner{
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.card {
+    width: 33.33%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+    min-height: 20vh;
+}
+
+.card img {
+    max-width: 100%;
+    max-height: 20vh;
+    object-fit: cover;
+}
+
+.card-title {
+    height: 50%;
+    padding: 10px;
+}
+
+.card p{
+    text-align: left;
+    padding: 0px 15px 10px;
+    font-size: 15px;
+}
+
+.card-footer {
+    height: 10%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+}
+
+.button {
+    background-color: #0376C3;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.icon-clock {
+    display: flex;
+    align-items: center;
+}
+
+.icon-clock i {
+    margin-right: 5px;
+}
+
+.carousel-nav {
+    text-align: center;
+}
+
+.carousel-nav button {
+    background-color: #0376C3;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px; 
+}
+
+#prev-button, #next-button {
+    background-color: #0376C3;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#prev-button {
+    float: left;
+}
+
+#next-button {
+    float: right;
+}
+
+/*----------SECTION 3 - ENROLLMENT----------*/
+.section3{
+    background-image: url(../img/s3.webp);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 70vh;
+}
+
+.enroll{
+    background-color: #0376c3de; 
+    padding: 20px;
+    margin-right: 100px;
+    max-width: 30vw;
+    text-align: center;
+    color: white;
+    height: 92%;
+}
+
+.section3 h2{
+    padding: 20px;
+    font-size: 1.7em;
+}
+
+.section3 p{
+    padding: 10px 0px;
+    font-size: 1.3em;
+}
+
+.section3 ul{
+    text-align: left;
+    padding: 10px 0px 0px 20px;
+}
+
+.section3 ul li{
+    font-size: 1.1em;
+    list-style: disc;
+}
+
+
+/*----------SECTION 4 - CONTACT----------*/
+.section4{
+    padding: 50px 0px;
+    text-align: center;
+}
+
+.section4 h2{
+    font-size: 2em;
+    padding-bottom: 30px;
+}
+
+.map{
+    display: flex;
+    justify-content: space-around;
+}
+
+.contact-info{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    max-width:min-content;
+}
+
+.contact-info i {
+    margin-right: 10px;
+    font-size: 2em;
+    color: #0376C3;
+}
+
+.contact-info p {
+    font-size: 1.5em;
+    margin: 5px 0;
+}
+
+.contact-icon{
+    display: flex;
+}
+
+/*----------FOOTER----------*/
+footer{
+    height: 25vh;
+    background-color: #002035;
+    text-align: center;
+}
+
+.smedia {
+    padding: 20px;
+}
+
+.smedia a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: white;
+}
+
+.smedia a:hover{
+    color: #45b3ea;
+}
+
+.smedia i{
+    font-size: 30px;
+}
+
+.logo img {
+    max-width: 100px;
+}
+
+.signature {
+    color: white;
+    font-size: 12px;
+    padding: 5px;
+}
+
+.signature p {
+    margin: 5px 0;
+}

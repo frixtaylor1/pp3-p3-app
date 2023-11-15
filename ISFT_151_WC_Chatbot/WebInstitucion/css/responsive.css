@@ -1,0 +1,117 @@
+/*cuando el ancho de la pantalla sea menor a 768px*/
+@media (max-width:768px) {
+    .navbar a{
+        display: none;
+    }
+
+    .navbar button{
+        display: none;
+    }
+
+    .img-header {
+        display: none;
+    }
+
+    .navbar{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navbar img{
+        width: 50vw;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 40vh;
+
+    }
+      
+    #header-titles {
+        margin: 20px;
+        text-align: center;
+    }
+      
+    #btn-header {
+        margin: 10px;
+    }
+    
+    /*----------SECTION 1----------*/
+    .section1 {
+        justify-content: center;
+        align-items: center;
+        background-color: #0578bb90;
+        position: relative;
+    }
+    
+    #bkgd-s1 {
+        width: 100%; 
+        height: 100%; 
+        position: absolute; 
+        top: 0;
+        left: 0;  
+        z-index: -1;
+    }
+    
+    .container {
+        z-index: 1;
+    }
+
+    /*----------SECTION 2----------*/
+    .carousel-inner {
+        flex-direction: column;
+    }
+    .card {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .carousel-nav {
+        text-align: center;
+    }
+
+    .card img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .card {
+        margin-right: 0;
+    }
+
+
+    /*----------SECTION 3 - ENROLLMENT----------*/
+    .section3{
+        background-attachment: fixed;
+    }
+
+    .enroll{
+        max-width: 100%;
+        margin: 0;
+        background-color: #2a89c0cb;
+        font-size: 0.9em;
+
+    }
+
+    /*----------SECTION 4 - CONTACT----------*/
+    .map{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .contact-info{
+        padding: 30px;
+    }
+
+}
+
+/*cuando el ancho de la pantalla sea menor a 768px*/
+@media (max-width:1150px) {
+    .navbar img{
+        width: 15vw;
+    }
+}

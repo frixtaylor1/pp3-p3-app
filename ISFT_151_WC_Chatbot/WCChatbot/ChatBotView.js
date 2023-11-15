@@ -1,3 +1,36 @@
+/**
+ * @file ChatBotView.js
+ * @description Web Component View for ChatBot
+ * @license GPL-3.0
+ * 
+ * WCChatBot - Web Component for Chat Bot
+ * Copyright (c) 2023 Omar Lopez, 
+ *                    Evelyn Flores, 
+ *                    Karen Manchado, 
+ *                    Facundo Caminos, 
+ *                    Ignacio Moreno,
+ *                    Kevin Taylor,
+ *                    Matias Cardenas
+ *                    ISFT N° 151
+ *
+ *  Project Supervisor: Prof. Matias Santiago Gastón
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Year: 2023
+ */
+
 import { WebcamView } from "../WCWebCam/WebcamView.js";
 import { WebcamModel } from "../WCWebCam/WebcamModel.js";
 import { WebcamController } from "../WCWebCam/WebcamController.js";
@@ -5,13 +38,30 @@ import { WebcamController } from "../WCWebCam/WebcamController.js";
 class ChatBotView extends HTMLElement {
   constructor() {
     super();
+  
+    this.webCam = new WebcamView();
+    this.webCamController = new WebcamController(this.webCam, new WebcamModel());
 
-    // let cameraView = new WebcamView();
-    // let cameraModel = new WebcamModel();
-    // let cameraController = new WebcamController(cameraView,cameraView);
+    // Crear el contenedor y agregar hijos a él
+    this.container = document.createElement("div");
+    this.container.className = "chatbot-container";
+
+    this.chatbotContainer = document.createElement("div");
+    this.chatbotContainer.className = "chatbot";
+    this.container.appendChild(this.chatbotContainer);
+
+    this.chatbotToggler = document.createElement("button");
+    this.chatbotToggler.className = "chatbot-toggler";
+    this.container.appendChild(this.chatbotToggler);
+
+    const linkElement = document.createElement("link");
+    linkElement.setAttribute("rel", "stylesheet");
+    linkElement.setAttribute("href", "../WCChatbot/style.css");
+    this.attachShadow({ mode: "open" });
+    this.shadowRoot.appendChild(linkElement);
+    this.shadowRoot.appendChild(this.container);
 
     this.header = document.createElement("header");
-
     this.h2 = document.createElement("h2");
     this.h2.textContent = "Chatbot";
 
@@ -27,7 +77,7 @@ class ChatBotView extends HTMLElement {
 
     this.userInput = document.createElement("textarea");
     this.userInput.className = "chat-input-text";
-    this.userInput.placeholder = "Escriba su message...";
+    this.userInput.placeholder = "Escriba su mensaje...";
     this.userInput.spellcheck = false;
     this.userInput.required = true;
 
@@ -58,21 +108,6 @@ class ChatBotView extends HTMLElement {
     this.buttonsContainer.style.padding = "3px 20px";
     this.buttonsContainer.style.borderTop = "1px solid #ddd";
 
-    this.buttonsContainer.appendChild(this.userInput);
-    this.buttonsContainer.appendChild(this.sendButton);
-
-    this.chatbotContainer = document.createElement("div");
-    this.chatbotContainer.className = "chatbot";
-    this.chatbotContainer.appendChild(this.header);
-    this.chatbotContainer.appendChild(this.progressBar);
-
-    this.chatbotContainer.appendChild(this.chatbox);
-
-    this.chatbotContainer.appendChild(this.buttonsContainer);
-
-    this.chatbotToggler = document.createElement("button");
-    this.chatbotToggler.className = "chatbot-toggler";
-
     this.iconModeComment = document.createElement("span");
     this.iconModeComment.className = "material-symbols-rounded";
     this.iconModeComment.textContent = "mode_comment";
@@ -84,16 +119,21 @@ class ChatBotView extends HTMLElement {
     this.chatbotToggler.appendChild(this.iconModeComment);
     this.chatbotToggler.appendChild(this.iconClose);
 
-    this.appendChild(this.chatbotToggler);
-    this.appendChild(this.chatbotContainer);
+    this.buttonsContainer.appendChild(this.userInput);
+    this.buttonsContainer.appendChild(this.sendButton);
+
+    this.chatbotContainer.appendChild(this.header);
+    this.chatbotContainer.appendChild(this.progressBar);
+    this.chatbotContainer.appendChild(this.chatbox);
+    this.chatbotContainer.appendChild(this.buttonsContainer);
 
     const closeBtn = this.chatbotContainer.querySelector(".close-btn");
     closeBtn.addEventListener("click", () =>
-      this.classList.remove("show-chatbot")
+      this.container.classList.remove("show-chatbot")
     );
 
     this.chatbotToggler.addEventListener("click", () =>
-      this.classList.toggle("show-chatbot")
+      this.container.classList.toggle("show-chatbot")
     );
 
     this.userInput.addEventListener("input", () => {
@@ -102,8 +142,7 @@ class ChatBotView extends HTMLElement {
         : "hidden";
     });
 
-    // Agregar la clase 'show-chatbot' al body para abrir el chatbot por defecto
-    this.classList.add("show-chatbot");
+    this.container.classList.add("show-chatbot");
   }
 
   connectedCallback() {
@@ -113,16 +152,19 @@ class ChatBotView extends HTMLElement {
 
     this.userInput.addEventListener("keydown", (event) => {
       if (event.keyCode === 13) {
-        // Tecla "Enter"
         event.preventDefault();
         this.enviarMensaje();
       }
+    });
+        
+    this.addEventListener('x-event-on-start-webcam', () => {
+      this.chatbox.appendChild(this.webCam);
+      this.webCamController.inicializar();
     });
   }
 
   enviarMensaje() {
     const respuestaUsuario = this.userInput.value;
-    // this.addMessage(`Tú: ${respuestaUsuario}`, false);
     const event = new CustomEvent("send", { detail: respuestaUsuario });
 
     this.userInput.value = "";
@@ -154,16 +196,13 @@ class ChatBotView extends HTMLElement {
     const chatMessage = document.createElement("li");
     chatMessage.className = `chat ${chatClass}`;
 
-    // Creación del icono de chat
     const chatIconSpan = document.createElement("span");
     chatIconSpan.className = "material-symbols-outlined";
     chatIconSpan.textContent = chatIcon;
 
-    // Creación del párrafo del message
     const chatMessageParagraph = document.createElement("p");
     chatMessageParagraph.textContent = message;
 
-    // Agregar elementos al message
     chatMessage.appendChild(chatIconSpan);
     chatMessage.appendChild(chatMessageParagraph);
 
@@ -172,7 +211,6 @@ class ChatBotView extends HTMLElement {
     this.chatbox.scrollTop = this.chatbox.scrollHeight;
   }
 }
-
-customElements.define("chat-bot-view", ChatBotView);
+customElements.define("x-chat-bot-view", ChatBotView);
 
 export { ChatBotView };

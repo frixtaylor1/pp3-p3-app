@@ -1,3 +1,36 @@
+/**
+ * @file ChatBotModel.js
+ * @description Model for the Web Component of ChatBot
+ * @license GPL-3.0
+ *
+ * WCChatBot - Web Component for Chat Bot
+ * Copyright (c) 2023 Omar Lopez, 
+ *                    Evelyn Flores, 
+ *                    Karen Manchado, 
+ *                    Facundo Caminos, 
+ *                    Ignacio Moreno,
+ *                    Kevin Taylor,
+ *                    Matias Cardenas
+ *                    ISFT N° 151
+ *
+ *  Project Supervisor: Prof. Matias Santiago Gastón
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Year: 2023
+ */
+
 import { ApiCallController } from '../ApiCallController/ApiCallController.js';
 
 class ChatBotModel 
@@ -10,6 +43,8 @@ class ChatBotModel
     this.registerProcessStatus      = false;
     this.startPreinscriptionStatus  = false;
     this.confirmedData              = {};
+    this.webCamData                 = null;
+    this.webCamStatus               = false;
 
     this.registerData = 
     {
@@ -164,9 +199,16 @@ class ChatBotModel
     });
     
     this.questions.set('foto', {
-      text: '¿Puedes subir una foto tuya?',
+      text: '¿Puedes subir una foto tuya? Para activar camara (SI/NO)',
       next: 'dni',
+      nextYes: 'webCam',
+      nextNo: 'dni',
     });
+
+    this.questions.set('webCam', {
+      text: '',
+      next: 'dni',
+    })
     
     this.questions.set('dni', {
       text: 'DNI: ',
@@ -278,7 +320,6 @@ class ChatBotModel
           } 
           else 
           {
-            // Por ahi tirar un console log de respuesta incorrecta
             this.currentQuestionId = 'welcome'; 
           }
         },
@@ -291,13 +332,11 @@ class ChatBotModel
           } 
           else 
           {
-            // Usuario no encontrado
-            this.currentQuestionId = 'login'; // Volver a preguntar por el nombre de usuario
+            this.currentQuestionId = 'login';
           }
         },
 
         'loginPassword': () => {
-
           if (this.isValidPassword(response)) 
           {
             this.loggedIn = true;
@@ -305,8 +344,7 @@ class ChatBotModel
           } 
           else 
           {
-            // Contraseña no valida
-            this.currentQuestionId = 'loginPassword'; // Volver a pedir la contraseña
+            this.currentQuestionId = 'loginPassword';
           }
         },
 
@@ -344,8 +382,31 @@ class ChatBotModel
           }
         },
 
+        'foto': () => {
+          if (response.toUpperCase() == 'SI') 
+          {
+            this.webCamStatus = true;
+          } 
+          else if (response.toUpperCase() == 'NO') 
+          {
+            this.currentQuestionId = 'dni';
+          }
+        },
+
+        'dni': () => {
+          if (this.questions.get('dni').validation) 
+          {
+            this.preinscriptionData.dni = response;
+            this.currentQuestionId = 'completed';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'dni';
+          }
+        },
+
         'carrera': () => {
-          if (this.carrerasValidas.includes(response.toLowerCase())) 
+          if (this.questions.get('carrera').validation(response)) 
           {
             this.preinscriptionData.carrera = response;
             this.startPreinscriptionStatus  = true;
@@ -357,6 +418,7 @@ class ChatBotModel
             this.currentQuestionId = 'carrera';
           }
         },
+
         'fechaNacimiento': () => {
           if (this.questions.get('fechaNacimiento').validation(response)) 
           {
@@ -371,11 +433,13 @@ class ChatBotModel
         },
 
         'verificationUserData': () => {
-
-          if (response.toUpperCase() == 'SI') {
+          if (response.toUpperCase() == 'SI') 
+          {
             this.currentQuestionId = 'gratitude';
             this.processStatus = true;
-          } else if (response.toUpperCase() == 'NO') {
+          } 
+          else if (response.toUpperCase() == 'NO') 
+          {
             this.currentQuestionId = 'modifyFields';
           }
         },
@@ -383,12 +447,15 @@ class ChatBotModel
         'completed': () => {
           this.confirmedData = this.preinscriptionData;
           this.questions.set('verificationUserData', {
-            text    : `Son correctos estos datos ?
-          Nombre completo: ${this.confirmedData.nombre} ${this.confirmedData.apellido} 
-          fecha de nacimiento: (${this.confirmedData.fechaNacimiento}) 
-          edad: (${this.confirmedData.edad}) 
-        
-          Responde si son correctos: (SI/NO)`,
+            text    : 
+      `Son correctos estos datos ?
+  nombre: ${this.confirmedData.nombre} 
+  apellido: ${this.confirmedData.apellido} 
+  fecha de nacimiento: ${this.confirmedData.fechaNacimiento} 
+  edad: ${this.confirmedData.edad}
+  carrera: ${this.confirmedData.carrera}
+  email: ${this.confirmedData.email}
+  Responde si son correctos: (SI/NO)`,
             nextYes : 'gratitude',
             nextNo  : 'modifyFields',
           });
@@ -405,7 +472,6 @@ class ChatBotModel
           
           else 
           {
-            // Manejar caso de respuesta no válida
             this.currentQuestionId = 'completed';
           }
         },
@@ -425,10 +491,7 @@ class ChatBotModel
         },
 
         'modifyFieldValue': () => {
-          //nombre del campo a modificar
-          let fieldName = this.fieldToModify;
-        
-          // Verifica si el campo a modificar es válido usando la validación definida en el mapa
+          let fieldName       = this.fieldToModify;
           let currentQuestion = this.questions.get(fieldName);
         
           if (currentQuestion && currentQuestion.validation(response)) 
@@ -437,7 +500,6 @@ class ChatBotModel
             console.log(this.preinscriptionData); 
             this.currentQuestionId = 'completed'; 
           } 
-
           else 
           {
             if(this.fieldToModify == 'edad' )
@@ -472,7 +534,8 @@ class ChatBotModel
   
       let handler = responseHandlers[this.currentQuestionId];
   
-      if (handler) {
+      if (handler) 
+      {
         handler();
       } 
       
@@ -493,7 +556,6 @@ class ChatBotModel
         }
       }
     } 
-    
     else 
     {
       // Manejar caso de pregunta no encontrada
@@ -510,6 +572,10 @@ class ChatBotModel
 
   isPreinscriptionStarted() {
     return this.startPreinscriptionStatus;
+  }
+
+  shouldTakePhoto() {
+    return this.webCamStatus;
   }
 
   /**
@@ -597,6 +663,33 @@ class ChatBotModel
 
     return result;
   }
+
+    /**
+   * @brief Envia una foto
+   * 
+   * @apidoc /sendPhoto
+   * @method  HTTP:POST 
+   * 
+   * @return  {Promise<JSON>}
+   **/
+  async sendPhoto() {
+    if (this.webCamData !== undefined || this.webCamData !== null) {
+      const imageDataBytes = Array.from(new Uint8Array(this.webCamData.data.buffer));
+
+      let dataToSend = {
+        id_user: parseInt(localStorage.getItem('id_user')),
+        imageData: imageDataBytes,
+      };
+
+      console.log(dataToSend);
+
+      let response = await this.apiController.callApi('/sendPhoto', 'POST', dataToSend);
+      let result = response[0];
+
+      console.log(result); 
+    }
+  }
+
     /**
    * @brief Calcula la edad de un usuario
    * 
@@ -616,6 +709,7 @@ class ChatBotModel
 
     return age;
   }
+
     /**
    * @brief Parsea formato de fecha a Year/month/day
    * 
@@ -626,14 +720,12 @@ class ChatBotModel
     #parseDate(dateString) 
     {
       const parts = dateString.split('/');
-      const day = parseInt(parts[0], 10);
+      const day   = parseInt(parts[0], 10);
       const month = parseInt(parts[1], 10) - 1;  // Restamos 1 porque en JavaScript los meses van de 0 a 11
-      const year = parseInt(parts[2], 10);
+      const year  = parseInt(parts[2], 10);
     
       return new Date(year, month, day);
     }
-    
-
 }
 
 export { ChatBotModel };

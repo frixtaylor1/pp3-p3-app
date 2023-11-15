@@ -1,9 +1,9 @@
 /**
- * @file WebcamModel.js
+ * @file ChatBotEntryPoint.js
  * @description Entry point for Web Component of ChatBot
  * @license GPL-3.0
  *
- * Webcam - Web Component for ChatBot
+ * WCChatBot - Web Component for Chat Bot
  * Copyright (c) 2023 Omar Lopez, 
  *                    Evelyn Flores, 
  *                    Karen Manchado, 
@@ -31,28 +31,16 @@
  * Year: 2023
  */
 
-class WebcamModel {
-  constructor() {
-    this.stream = null;
-    this.restricciones = {
-      audio: true,
-      video: {
-        width: 320,
-        height: 240,
-      },
-    };
-  }
+import { ChatBotController }  from "./ChatBotController.js";
+import { ChatBotView }        from "./ChatBotView.js";
+import { ChatBotModel }       from "./ChatBotModel.js";
 
-  async inicializar() {
-    try {
-      this.stream = await navigator.mediaDevices.getUserMedia(
-        this.restricciones
-      );
-      return this.stream;
-    } catch (e) {
-      throw new Error(`Error de navigator.getUserMedia: ${e.toString()}`);
-    }
-  }
+function WebComponentEntryPoint()
+{
+  let chatBotView = new ChatBotView();
+  new ChatBotController(chatBotView, new ChatBotModel());
+
+  document.body.appendChild(chatBotView);
 }
 
-export { WebcamModel };
+window.onload = WebComponentEntryPoint;
