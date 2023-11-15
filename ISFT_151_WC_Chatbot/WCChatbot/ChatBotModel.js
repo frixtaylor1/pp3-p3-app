@@ -60,8 +60,15 @@ class ChatBotModel
     });
     
     this.questions.set('loginPassword', {
-      text: 'Ingresa tu contraseña:',
+      text: 'Ingresa una contraseña' + 
+      '\n8 caracteres minimo' + 
+      '\nPor lo menos una mayuscula'+ 
+      '\n2 numeros y un caracter especial(! @ # $ % ^ & * ( ) _ +):',      
       next: 'completed',
+      validation: (response) => {
+        // Validación de contraseña: al menos una mayúscula, dos números, un carácter especial y 8 caracteres mínimo
+        return /^(?=.*[A-Z])(?=(?:.*\d){2})(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/.test(response.trim());
+      },
     });
     
     this.questions.set('createAccount', {
@@ -70,8 +77,15 @@ class ChatBotModel
     });
     
     this.questions.set('createAccountPassword', {
-      text: 'Ingresa una contraseña:',
+      text: 'Ingresa una contraseña' + 
+      '\n8 caracteres minimo' + 
+      '\nPor lo menos una mayuscula'+ 
+      '\n2 numeros y un caracter especial(! @ # $ % ^ & * ( ) _ +):',
       next: 'nombre',
+      validation: (response) => {
+        // Validación de contraseña: al menos una mayúscula, dos números, un carácter especial y 8 caracteres mínimo
+        return /^(?=.*[A-Z])(?=(?:.*\d){2})(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/.test(response.trim());
+      },
     });
     
     this.questions.set('nombre', {
@@ -94,18 +108,28 @@ class ChatBotModel
     
     this.questions.set('edad', {
       text: 'Edad: ',
-      // next: 'fechaNacimiento',
-      // validation: (response) => {
-   
-      //   let age = parseInt(response);
-      //   return !isNaN(age) && age >= 18 && age <= 99;
-      // },
+      next: 'fechaNacimiento',
+      validation: (response) => {
+
+        let age = parseInt(response);
+        if(age != this.preinscriptionData.edad)
+        {
+
+        }
+        else
+        {
+          return true
+        }
+        // return !isNaN(age) && age >= 18 && age <= 99;
+      },
     });
     
     this.questions.set('fechaNacimiento', {
       text: 'Fecha de nacimiento (dd/mm/aaaa): ',
       next: 'telefono',
       validation: (response) => {
+        
+        this.preinscriptionData.edad = this.#calculateAge((this.#parseDate(`${response}`)));
        //La fecha de nacimiento debe tener un formato valido (por ejemplo, 'dd/mm/aaaa')
         return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(response.trim());
       },
@@ -164,6 +188,10 @@ class ChatBotModel
     
     this.questions.set('modifyFieldValue', {
       text: 'Ingresa el nuevo valor para el campo:',
+      next: 'warning',
+    });
+    this.questions.set('warning', {
+      text: 'Warning: ',
       next: 'completed',
     });
 
@@ -288,16 +316,32 @@ class ChatBotModel
         },
 
         'createAccountPassword': () => {
-          this.registerData.password = response;
-          this.currentQuestionId = 'nombre';
-
-          this.registerProcessStatus = true;
+          if (this.questions.get('createAccountPassword').validation(response)) 
+          {
+            this.registerData.password = response;
+            this.registerProcessStatus = true;
+            
+            this.currentQuestionId = 'nombre';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'createAccountPassword';
+          }
         },
 
         'email': () => {
-          this.preinscriptionData.email = response;
-          this.startPreinscriptionStatus  = false;
-          this.currentQuestionId = 'foto';
+
+          if (this.questions.get('email').validation(response)) 
+          {
+            this.preinscriptionData.email = response;
+            this.startPreinscriptionStatus  = false;
+            
+            this.currentQuestionId = 'foto';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'email';
+          }
         },
 
         'carrera': () => {
@@ -306,7 +350,7 @@ class ChatBotModel
             this.preinscriptionData.carrera = response;
             this.startPreinscriptionStatus  = true;
             
-            this.currentQuestionId          = 'email';
+            this.currentQuestionId = 'email';
           } 
           else 
           {
@@ -314,12 +358,11 @@ class ChatBotModel
           }
         },
         'fechaNacimiento': () => {
-          if (this.questions.get('fechaNacimiento').validation) 
+          if (this.questions.get('fechaNacimiento').validation(response)) 
           {
-            this.preinscriptionData.edad = this.#calculateAge((this.#parseDate(`${response}`)));
             this.preinscriptionData.fechaNacimiento = response;
 
-            this.currentQuestionId          = 'telefono';
+            this.currentQuestionId = 'telefono';
           } 
           else 
           {
@@ -397,9 +440,34 @@ class ChatBotModel
 
           else 
           {
-            this.currentQuestionId = 'modifyFieldValue'; 
+            if(this.fieldToModify == 'edad' )
+            {
+              this.questions.get('warning').text = `tu edad segun tu fecha de nacimiento es ${this.preinscriptionData.edad}.
+              Si es incorrecta, modifica tu fecha de nacimiento ${this.preinscriptionData.fechaNacimiento}. 
+              ¿Modificar campo? (SI/NO)`
+              this.fieldToModify = 'fechaNacimiento';
+            }
+            else
+            {
+              this.questions.get('warning').text = `Valor ${response} incorrecto en campo ${fieldName}. ¿Modificar campo? (SI/NO)`
+            }
+
+            this.currentQuestionId = 'warning'; 
           }
-        }
+        },
+
+        'warning': () => {
+          if (response.toUpperCase() === 'SI') 
+          {
+            this.currentQuestionId = 'modifyFieldValue';
+          } 
+          
+          else if (response.toUpperCase() === 'NO') 
+          {
+            this.currentQuestionId = 'verificationUserData';
+          } 
+          
+        }    
       };
   
       let handler = responseHandlers[this.currentQuestionId];
@@ -532,7 +600,7 @@ class ChatBotModel
     /**
    * @brief Calcula la edad de un usuario
    * 
-   * @param {string} fecha de nacimientoo
+   * @param {string} - fecha de nacimientoo
    * 
    * @return  {string} edad
    **/
