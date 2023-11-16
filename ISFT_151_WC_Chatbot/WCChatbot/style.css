@@ -66,8 +66,9 @@
   position: relative;
   text-align: center;
   color: #fff;
-  background: #724ae8;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: #0376C3;
+  box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1),
+    0 32px 64px -48px rgba(0, 0, 0, 0.5);
 }
 .chatbot header span {
   position: absolute;
@@ -113,9 +114,10 @@ header h2 {
   text-align: center;
   line-height: 32px;
   align-self: flex-end;
-  background: #724ae8;
+  background: #0376C3;
   border-radius: 4px;
   margin: 0 10px 7px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 .chatbox .chat p {
   white-space: pre-wrap;
@@ -124,7 +126,7 @@ header h2 {
   max-width: 75%;
   color: #fff;
   font-size: 0.95rem;
-  background: #724ae8;
+  background: #0376C3;
 }
 .chatbox .incoming p {
   border-radius: 10px 10px 10px 0;
@@ -160,7 +162,7 @@ header h2 {
 }
 .chat-input span {
   align-self: flex-end;
-  color: #724ae8;
+  color: #0376C3;
   cursor: pointer;
   height: 55px;
   display: flex;
@@ -203,10 +205,10 @@ header h2 {
 #capturar,
 #confirmar,
 #botonNuevaFoto {
-  background-color: #724ae8;
+  background-color: #0376C3;
   margin: 10px;
   padding: 4px 8px;
-  background: #724ae8;
+  background: #0376C3;
   color: #fff;
   border: none;
   cursor: pointer;

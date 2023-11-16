@@ -5,12 +5,13 @@
  *
  * WCChatBot - Web Component for Chat Bot
  * Copyright (c) 2023 Omar Lopez, 
- *                    Evelyn Flores, 
+ *                    Evelyn Oliva, 
  *                    Karen Manchado, 
  *                    Facundo Caminos, 
  *                    Ignacio Moreno,
  *                    Kevin Taylor,
  *                    Matias Cardenas
+ *                    Daniel Beinat
  *                    ISFT N° 151
  *
  *  Project Supervisor: Prof. Matias Santiago Gastón
@@ -37,7 +38,7 @@ class ChatBotModel
 {
   constructor() 
   {
-    this.apiController = new ApiCallController('http://127.0.0.1:3336');
+    this.apiController = new ApiCallController('http://127.0.0.1:3300');
 
     this.processStatus              = false;
     this.registerProcessStatus      = false;
