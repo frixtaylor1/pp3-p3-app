@@ -63,27 +63,42 @@ class WebcamView extends HTMLElement {
     this.botonNuevaFoto.innerText = "Tomar otra foto";
     this.botonNuevaFoto.disabled = true;
 
-    this.contenedorControles = createElement("div", {
-      class: "contenedor-controles",
-    });
-
-    this.contenedorControles.appendChild(this.capturarBoton);
-    this.contenedorControles.appendChild(this.confirmarBoton);
-    this.contenedorControles.appendChild(this.botonNuevaFoto);
-
     this.lienzo = createElement("canvas", {
       id: "lienzo",
       width: 320,
       height: 240,
     });
 
+    this.contenedorControles = createElement("div", {
+      class: "contenedor-controles",
+    });
+
+    this.lienzo.style.display = "none";
+
+    this.capturarBoton.addEventListener('click', () => {
+      this.video.style.display = "none";
+      this.lienzo.style.display = "block";
+    });
+
+
+    this.botonNuevaFoto.addEventListener('click', () => {
+      this.lienzo.style.display = "none";
+      this.video.style.display = "block";
+    });
+
+    this.contenedorControles.appendChild(this.capturarBoton);
+    this.contenedorControles.appendChild(this.confirmarBoton);
+    this.contenedorControles.appendChild(this.botonNuevaFoto);
+
+
+
     this.elementoMensajeError = createElement("span", {
       id: "elementoMensajeError",
     });
 
     this.appendChild(this.contenedorVideo);
-    this.appendChild(this.contenedorControles);
     this.appendChild(this.lienzo);
+    this.appendChild(this.contenedorControles);
   }
 
   mostrarMensajeError(error) {
