@@ -47,18 +47,16 @@ class WebcamController {
       this.confirmarFoto()
     );
 
-    // this.view.botonDescargar.addEventListener("click", () =>
-    //   this.descargarFoto()
-    // );
-
     this.view.botonNuevaFoto.addEventListener("click", () =>
       this.tomarOtraFoto()
     );
 
     this.view.addEventListener('x-event-on-confirm-photo', () => {
+      let base64String = btoa(this.#imageData.data);
+
       document.dispatchEvent(new CustomEvent('x-event-on-confirmed-photo', {
         detail: {
-          imageData: this.#imageData.data
+          imageData: base64String,
         }
       }));
     });
@@ -80,7 +78,6 @@ class WebcamController {
 
     this.#imageData = contexto.getImageData(0, 0, 320, 240);
 
-    // this.view.botonDescargar.disabled = false;
     this.view.botonNuevaFoto.disabled = false;
   }
 
@@ -90,39 +87,17 @@ class WebcamController {
 
   async detenerCamara() {
     if (this.stream) {
-      // Recorre todas las pistas de la cámara y desactívalas
       this.stream.getTracks().forEach((track) => {
         track.enabled = false;
         track.stop();
       });
     }
 
-    // Elimina todo el contenido de la cámara
-    // const contenedorCamara = document.querySelector(".contenedor-video");
-    // if (contenedorCamara) {
-    //   contenedorCamara.parentNode.removeChild(contenedorCamara);
-    // }
-
-    const webcamView = document.querySelector("webcam-view");
-    if (webcamView) {
-      webcamView.parentNode.removeChild(webcamView);
-    }
-
-    // Elimina también el contenedor de controles
-    // const contenedorControles = document.querySelector(".contenedor-controles");
-    // if (contenedorControles) {
-    //   contenedorControles.parentNode.removeChild(contenedorControles);
-    // }
   }
-
-  // async confirmarFoto() {
-  //   this.detenerCamara();
-  // }
 
   async confirmarFoto(callback) {
     this.detenerCamara();
 
-    // Llama al callback (en este caso, el callback es una función de ChatBotController).
     if (callback) {
       callback();
     }
@@ -135,7 +110,6 @@ class WebcamController {
   tomarOtraFoto() {
     const contexto = this.view.lienzo.getContext("2d");
     contexto.clearRect(0, 0, this.view.lienzo.width, this.view.lienzo.height);
-    // this.view.botonDescargar.disabled = true;
     this.view.botonNuevaFoto.disabled = true;
   }
 }

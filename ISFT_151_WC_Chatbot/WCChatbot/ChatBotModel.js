@@ -200,16 +200,14 @@ class ChatBotModel
     
     this.questions.set('foto', {
       text: '¿Puedes subir una foto tuya? Para activar camara (SI/NO)',
-      next: 'dni',
       nextYes: 'webCam',
       nextNo: 'dni',
     });
 
     this.questions.set('webCam', {
-      text: '',
       next: 'dni',
-    })
-    
+    });
+
     this.questions.set('dni', {
       text: 'DNI: ',
       next: 'completed',
@@ -240,7 +238,7 @@ class ChatBotModel
     this.questions.set('completed', {
       text: 'Se ha completado los datos de inscripción. Quieres verificar tu datos? (SI/NO)',
       nextYes: 'verificationUserData',
-      nextNo: 'modidyFieldValue'
+      nextNo: 'gratitude'
     });
 
     //Inicio de chat en WELCOME
@@ -386,6 +384,7 @@ class ChatBotModel
           if (response.toUpperCase() == 'SI') 
           {
             this.webCamStatus = true;
+            this.currentQuestionId = 'dni';
           } 
           else if (response.toUpperCase() == 'NO') 
           {
@@ -396,6 +395,7 @@ class ChatBotModel
         'dni': () => {
           if (this.questions.get('dni').validation) 
           {
+            this.webCamStatus = false;
             this.preinscriptionData.dni = response;
             this.currentQuestionId = 'completed';
           } 
@@ -467,7 +467,7 @@ class ChatBotModel
           
           else if (response.toUpperCase() === 'NO') 
           {
-            this.currentQuestionId = 'modifyFields';
+            this.currentQuestionId = 'gratitude';
           } 
           
           else 
@@ -616,14 +616,12 @@ class ChatBotModel
       name              : this.confirmedData.nombre,
       surname           : this.confirmedData.apellido,
       dni               : this.confirmedData.dni,
-      birthdate         : (this.confirmedData.fechaNacimiento).replace('/', '-'),
+      birthdate         : (this.confirmedData.fechaNacimiento).replaceAll('/', '-'),
       email             : this.confirmedData.email,
     };
 
-    console.log('PREINSCRIPTION DATA >>>', preinscriptionData);
-
     let request = await this.apiController.callApi('/confirmPreinscription', 'POST', preinscriptionData);
-    let result  = await request.json();
+    let result  = await request[0];
 
     this.processStatus = false;
 
@@ -673,18 +671,16 @@ class ChatBotModel
    * @return  {Promise<JSON>}
    **/
   async sendPhoto() {
-    if (this.webCamData !== undefined || this.webCamData !== null) {
-      const imageDataBytes = Array.from(new Uint8Array(this.webCamData.data.buffer));
-
+    if (this.webCamData !== undefined && this.webCamData !== null && this.webCamData !== '') {
       let dataToSend = {
         id_user: parseInt(localStorage.getItem('id_user')),
-        imageData: imageDataBytes,
+        imageData: this.webCamData,
       };
 
       console.log(dataToSend);
 
-      let response = await this.apiController.callApi('/sendPhoto', 'POST', dataToSend);
-      let result = response[0];
+      let response  = await this.apiController.callApi('/sendPhoto', 'POST', dataToSend);
+      let result    = response[0];
 
       console.log(result); 
     }

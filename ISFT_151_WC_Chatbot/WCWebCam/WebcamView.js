@@ -56,11 +56,8 @@ class WebcamView extends HTMLElement {
 
     this.confirmarBoton.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('x-event-on-confirm-photo'));
+      this.parentNode.removeChild(this);
     });
-
-    // this.botonDescargar = createElement("button", { id: "botonDescargar" });
-    // this.botonDescargar.innerText = "Descargar Foto";
-    // this.botonDescargar.disabled = true;
 
     this.botonNuevaFoto = createElement("button", { id: "botonNuevaFoto" });
     this.botonNuevaFoto.innerText = "Tomar otra foto";
@@ -72,7 +69,6 @@ class WebcamView extends HTMLElement {
 
     this.contenedorControles.appendChild(this.capturarBoton);
     this.contenedorControles.appendChild(this.confirmarBoton);
-    // this.contenedorControles.appendChild(this.botonDescargar);
     this.contenedorControles.appendChild(this.botonNuevaFoto);
 
     this.lienzo = createElement("canvas", {
