@@ -43,6 +43,7 @@ class ChatBotModel
     this.processStatus              = false;
     this.registerProcessStatus      = false;
     this.startPreinscriptionStatus  = false;
+    this.progresBarStatus           = false;
     this.confirmedData              = {};
     this.webCamData                 = null;
     this.webCamStatus               = false;
@@ -218,7 +219,9 @@ class ChatBotModel
     });
 
     this.questions.set('gratitude', {
-      text: '¡Gracias por completar la preinscripción! ¿Deseas continuar con la Inscripcion?',
+      text: `¡Gracias por completar la preinscripción!
+      Te enviaré un mail de confirmación de la inscripción con tus datos. Cualquier duda puedes contactarte al 0223 472-7800 o puedes acercarte a la institución en Casteli y San Juan.
+      ¿Deseas continuar chateando conmigo?(SI/NO).`,
       next: 'welcome',
     });
 
@@ -311,10 +314,12 @@ class ChatBotModel
         'welcome': () => {
           if (response.toUpperCase() === 'SI') 
           {
+            this.progresBarStatus = true;
             this.currentQuestionId = currentQuestion.nextYes;
           } 
           else if (response.toUpperCase() === 'NO') 
           {
+            this.progresBarStatus = true;
             this.currentQuestionId = currentQuestion.nextNo;
           } 
           else 
@@ -366,6 +371,31 @@ class ChatBotModel
           }
         },
 
+        'nombre': () => {
+          if (this.questions.get('nombre').validation(response)) 
+          {
+            this.preinscriptionData.nombre = response;
+
+            this.currentQuestionId = 'apellido';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'nombre';
+          }
+        },
+
+        'apellido': () => {
+          if (this.questions.get('apellido').validation(response)) 
+          {
+            this.preinscriptionData.apellido = response;
+            this.currentQuestionId = 'fechaNacimiento';
+          } 
+          else 
+          {
+            this.currentQuestionId = 'apellido';
+          }
+        },
+
         'email': () => {
 
           if (this.questions.get('email').validation(response)) 
@@ -385,10 +415,12 @@ class ChatBotModel
           if (response.toUpperCase() == 'SI') 
           {
             this.webCamStatus = true;
+            this.preinscriptionData.foto = true;
             this.currentQuestionId = 'dni';
           } 
           else if (response.toUpperCase() == 'NO') 
           {
+            this.preinscriptionData.foto = true;
             this.currentQuestionId = 'dni';
           }
         },
@@ -519,6 +551,23 @@ class ChatBotModel
           }
         },
 
+        'gratitude': () => {
+          if (response.toUpperCase() === 'SI') 
+          {
+            this.currentQuestionId = 'welcome';
+          } 
+          
+          else if (response.toUpperCase() === 'NO') 
+          {
+            this.currentQuestionId = 'welcome';
+          } 
+          
+          else 
+          {
+            this.currentQuestionId = 'gratitude';
+          }
+        },
+
         'warning': () => {
           if (response.toUpperCase() === 'SI') 
           {
@@ -579,6 +628,16 @@ class ChatBotModel
     return this.webCamStatus;
   }
 
+  shouldResetPersentBar() {
+    let completedFields = Object.values(this.preinscriptionData).filter(
+      (field) => field !== null
+    ).length;
+
+    if (completedFields > 3 && this.isCompleted()) {
+      return this.progresBarStatus;
+    }
+  }
+
   /**
    * @brief Comienza la inscripcion 
    * 
@@ -624,7 +683,15 @@ class ChatBotModel
     let request = await this.apiController.callApi('/confirmPreinscription', 'POST', preinscriptionData);
     let result  = await request[0];
 
-    this.processStatus = false;
+    this.preinscriptionData.nombre = null;
+    this.preinscriptionData.apellido = null;
+    this.preinscriptionData.dni = null;
+    this.preinscriptionData.email = null;
+    this.preinscriptionData.foto = null;
+    this.preinscriptionData.genero = null;
+    this.preinscriptionData.fechaNacimiento = null;
+
+    this.processStatus      = false;
 
     return result;
   }

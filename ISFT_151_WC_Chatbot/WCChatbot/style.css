@@ -52,8 +52,7 @@
   pointer-events: none;
   transform: scale(0.5);
   transform-origin: bottom right;
-  box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1),
-    0 32px 64px -48px rgba(0, 0, 0, 0.5);
+  box-shadow: #002035 0px 0px 4px 3px;
   transition: all 0.1s ease;
 }
 .show-chatbot .chatbot {
@@ -128,17 +127,18 @@ header h2 {
   font-size: 0.95rem;
   background: #0376C3;
 }
-.chatbox .incoming p {
-  border-radius: 10px 10px 10px 0;
-}
+
 .chatbox .chat p.error {
   color: #721c24;
   background: #f8d7da;
 }
 .chatbox .incoming p {
+  border-radius: 10px 10px 10px 0;
+  background-color: #c9c9c9;
   color: #000;
-  background: #f2f2f2;
+
 }
+
 .chatbot .chat-input {
   display: flex;
   gap: 5px;
@@ -231,6 +231,18 @@ header h2 {
 }
 .progress-bar-fill {
   height: 100%;
-  background-color: #048d09;
+  background-color: rgb(169, 249, 171);
   transition: width 0.3s;
 }
+
+.progress-bar-text {
+  margin-left: 8em;
+  color: #0376C3;
+  font-weight: bold;
+}
+
+@media (max-width: 490px) {
+  .progress-bar-text {
+    margin-left: 4em;
+  }
+} 

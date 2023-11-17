@@ -59,7 +59,7 @@ class ChatBotController
   updateProgress() {
     let progress = this.model.getPreinscriptionPercent();
 
-    if (progress >= 0) {
+    if (progress > 0) {
       this.view.setPercentBar(progress);
       this.view.showPercentBar();
     } else {
@@ -97,6 +97,7 @@ class ChatBotController
     this.#onStartWebcam();
     this.#onConfirmPhoto();
     this.#onCompleted();
+    this.#onResetProgressBar();
   }
 
   #onCompleted() {
@@ -104,8 +105,8 @@ class ChatBotController
       let confirmPreinscriptionResult = this.model.confirmPreinscription();
       confirmPreinscriptionResult.then((result) => {
         console.log(result);
+        this.view.setPercentBar(100);
       });
-      this.view.setPercentBar(0);
     }
   }
 
@@ -141,6 +142,13 @@ class ChatBotController
       this.model.webCamData = event.detail.imageData;
       this.model.sendPhoto();
     });
+  }
+
+  #onResetProgressBar() {
+    if (this.model.shouldResetPersentBar()) {
+      this.view.setPercentBar(0);
+      this.view.hidePercentBar();
+    }
   }
 }
 

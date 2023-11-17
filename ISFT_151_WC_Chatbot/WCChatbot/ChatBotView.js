@@ -173,9 +173,11 @@ class ChatBotView extends HTMLElement {
     this.dispatchEvent(event);
   }
 
-  setPercentBar(percent) {
+  setPercentBar(percent) 
+  {
     this.progressBarFill.style.width = `${percent}%`;
-    this.progressBarText.textContent = `${Math.round(percent)}%`;
+    this.progressBarText.style.width = `${percent}%`;
+    this.progressBarText.textContent = `Preinscripción:${Math.round(percent)}%`;
   }
 
   hidePercentBar() {
